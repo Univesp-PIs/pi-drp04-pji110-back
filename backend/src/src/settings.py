@@ -16,6 +16,9 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 
+# Configurar url post db
+import dj_database_url
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -88,20 +91,24 @@ WSGI_APPLICATION = 'src.wsgi.application'
 DATABASES = {
     'default': {
         # Altera o motor de banco de dados para MySQL
-        'ENGINE': os.getenv('ENGINE'), 
+        'ENGINE': os.getenv('DATABASE_ENGINE'), 
         # Nome do banco de dados  
-        'NAME': os.getenv("NAME"), 
+        'NAME': os.getenv("DATABASE_NAME"), 
         # Usuário do banco de dados (padrão defaut - 'root')             
-        'USER': os.getenv("USER"), 
+        'USER': os.getenv("DATABASE_USER"), 
         # Senha do banco de dados (se houver)                      
-        'PASSWORD': os.getenv("PASSWORD"), 
+        'PASSWORD': os.getenv("DATABASE_PASSWORD"), 
         # Host do banco de dados (no caso, 'localhost')                       
-        'HOST': os.getenv("HOST"),
+        'HOST': os.getenv("DATABASE_HOST"),
         # Porta do banco de dados (opcional, padrão para MySQL é 3306)                   
-        'PORT': os.getenv("PORT") 
+        'PORT': os.getenv("DATABASE_PORT") 
     }
 }
 
+DATABASES['default'] = dj_database_url.parse("postgres://django_postgresql_evcx_user:Z39IoERquYBYndb3GEblSndv01sOakJq@dpg-com1o221hbls73998950-a.oregon-postgres.render.com/django_postgresql_evcx")
+
+# postgres://django_postgresql_evcx_user:Z39IoERquYBYndb3GEblSndv01sOakJq@dpg-com1o221hbls73998950-a/django_postgresql_evcx
+# postgres://django_postgresql_evcx_user:Z39IoERquYBYndb3GEblSndv01sOakJq@dpg-com1o221hbls73998950-a.oregon-postgres.render.com/django_postgresql_evcx
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

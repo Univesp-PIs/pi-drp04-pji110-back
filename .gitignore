@@ -28,7 +28,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
-.env*.local
+#.env*.local
 
 # vercel
 .vercel
@@ -43,7 +43,7 @@ yarn.lock
 
 .venv
 
-.env
+#.env
 
 logs/
 
@@ -177,7 +177,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-.env
+#.env
 .venv
 env/
 venv/
