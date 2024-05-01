@@ -32,10 +32,13 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv("DEBUG", "False").lower() == "true"
 
-ALLOWED_HOSTS = []
-
+#ALLOWED_HOSTS = [os.getenv("ALLOWED_HOSTS").split(",")]
+ALLOWED_HOSTS = [
+    'localhost',
+    'django-test-server3.onrender.com',
+]
 
 # Application definition
 
@@ -52,6 +55,9 @@ INSTALLED_APPS = [
     'account',
     'home',
     'curriculum',
+
+    # Adicionar o cors
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -105,7 +111,9 @@ DATABASES = {
     }
 }
 
-DATABASES['default'] = dj_database_url.parse("postgres://django_postgresql_evcx_user:Z39IoERquYBYndb3GEblSndv01sOakJq@dpg-com1o221hbls73998950-a.oregon-postgres.render.com/django_postgresql_evcx")
+#ISSO
+database_url = os.getenv("DATABASE_URL")
+DATABASES['default'] = dj_database_url.parse(database_url)
 
 # postgres://django_postgresql_evcx_user:Z39IoERquYBYndb3GEblSndv01sOakJq@dpg-com1o221hbls73998950-a/django_postgresql_evcx
 # postgres://django_postgresql_evcx_user:Z39IoERquYBYndb3GEblSndv01sOakJq@dpg-com1o221hbls73998950-a.oregon-postgres.render.com/django_postgresql_evcx
@@ -159,3 +167,5 @@ REST_FRAMEWORK = {
     ),
     # Outras configurações REST_FRAMEWORK, se houver
 }
+
+CORS_ORIGIN_ALLOW_ALL = True
