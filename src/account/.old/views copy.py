@@ -2,9 +2,9 @@ from django.shortcuts import render
 
 # Create your views here.
 # Importar as models (tabelas)
-from .models import User
+from .models import Credential
 # Importar forms para salvar no banco
-from .forms import UserForm
+from .forms import CredentialForm
 # Importar configurações para Json e HTTP
 from django.http import JsonResponse
 import json
@@ -25,27 +25,37 @@ def signup(request):
         data = json.loads(request.body)
 
         # Verificar se os campos de email e senha estão presentes
+        name = data.get('name')
         email = data.get('email')
         password = data.get('password')
 
         # Se ambos os campos estiverem presentes, continue com o processamento
         if email and password:
 
-            # Criar um formulário com os dados recebidos
-            form = UserForm(data)
+            # Verificar se já existe uma credencial com o mesmo e-mail no banco de dados
+            existing_credential = Credential.objects.filter(email=email).first()
 
-            if form.is_valid():
+            if not existing_credential:
 
-                # Salvar os dados no banco de dados
-                form.save()
-            
-                # Sua lógica de criação de usuário aqui
-                return JsonResponse({'message': 'Cadastro realizado com sucesso'})
-            
+                # Criar um formulário com os dados recebidos
+                form = CredentialForm(data)
+
+                if form.is_valid():
+
+                    # Salvar os dados no banco de dados
+                    form.save()
+                
+                    # Sua lógica de criação de usuário aqui
+                    return JsonResponse({'message': 'Cadastro realizado com sucesso'})
+                
+                else:
+
+                    # Retornar uma resposta JSON com erros de validação
+                    return JsonResponse({'errors': form.errors}, status=400)
+                
             else:
-
-                # Retornar uma resposta JSON com erros de validação
-                return JsonResponse({'errors': form.errors}, status=400)
+                # Se já existir uma credencial com este e-mail, retorne uma mensagem de erro
+                return JsonResponse({'error': 'Já existe uma conta cadastrada com este e-mail'}, status=400)
         
         else:
 
@@ -78,7 +88,7 @@ def login(request):
             try:
 
                 # Buscar o usuário no banco de dados pelo email
-                user = User.objects.get(email=email)
+                user = Credential.objects.get(email=email)
 
                 if password == user.password:
 
@@ -93,7 +103,7 @@ def login(request):
                     expiry_timestamp = int(time.time()) + token_lifetime_seconds
 
                     # Gerar resposta json payload
-                    payload = {'token':token, 'expiry_timestamp': expiry_timestamp, 'user_id': user.id}
+                    payload = {'token':token, 'expiry_timestamp': expiry_timestamp, 'user_id': user.id, 'user_email': email, 'user_name': user.name}
 
                     # Retornar uma mensagem de sucesso
                     #return JsonResponse({'message': 'Login realizado com sucesso', 'token': token, 'id': user.id})
@@ -104,7 +114,7 @@ def login(request):
                     # Senha incorreta, retornar mensagem de erro
                     return JsonResponse({'error': 'Credenciais inválidas'}, status=400)
                 
-            except User.DoesNotExist:
+            except Credential.DoesNotExist:
 
                 # Usuário não encontrado, retornar mensagem de erro
                 return JsonResponse({'error': 'Usuário não encontrado'}, status=200)
